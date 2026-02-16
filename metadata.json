@@ -1,0 +1,7 @@
+{
+  "name": "Contact MP - ABM Ashraf Uddin Nizan",
+  "description": "A government-themed portal for citizens to submit complaints, suggestions, and messages directly to MP ABM Ashraf Uddin Nizam.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
