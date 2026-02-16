@@ -8,10 +8,10 @@
     <meta name="description" content="সংসদ সদস্য এবিএম আশরাফ উদ্দিন নিজান এর সাথে সরাসরি যোগাযোগের অফিসিয়াল ডিজিটাল প্ল্যাটফর্ম। আপনার অভিযোগ ও মতামত দ্রুত সমাধানের জন্য এখানে জমা দিন।">
     <meta name="theme-color" content="#006a4e">
     
-    <!-- Open Graph for Social Media -->
-    <meta property="og:title" content="এবিএম আশরাফ উদ্দিন নিজান - ডিজিটাল পোর্টাল">
-    <meta property="og:description" content="জনগণের কথা সরাসরি শুনতে এবং সমস্যা সমাধানে ডিজিটাল প্ল্যাটফর্ম।">
-    <meta property="og:type" content="website">
+    <script>
+      // Shim process.env for browser compatibility if not provided by build tool
+      window.process = window.process || { env: {} };
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -54,17 +54,6 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
-        .shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
         .view-transition {
             animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -74,7 +63,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f8fafc; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
