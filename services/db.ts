@@ -12,8 +12,10 @@ const getClient = () => {
   if (supabaseClient) return supabaseClient;
   
   if (!SUPABASE_URL || !SUPABASE_KEY || SUPABASE_URL.includes('your-project')) {
-    console.warn("Supabase credentials are missing or default. Application may not work properly.");
+    console.warn("Supabase credentials are missing or default.");
   }
+
+  console.log("Connecting to Supabase at:", SUPABASE_URL);
 
   supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
     auth: { persistSession: false }
