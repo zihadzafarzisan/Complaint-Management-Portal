@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ComplaintForm } from '../types';
 import { db } from '../services/db';
-import { GoogleGenAI } from "@google/genai";
 
 interface Props {
   onLogout?: () => void;
@@ -15,8 +14,6 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'solved' | 'rejected'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState<ComplaintForm | null>(null);
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
-  const [isAiLoading, setIsAiLoading] = useState(false);
 
   const refreshData = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
@@ -45,28 +42,6 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       trash: items.filter(i => i.deletedAt).length
     };
   }, [items]);
-
-  const generateAiSummary = async (text: string) => {
-    setIsAiLoading(true);
-    setAiSummary(null);
-    try {
-      if (!process.env.API_KEY) {
-        setAiSummary("API Key কনফিগার করা নেই।");
-        return;
-      }
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: `বড় এই অভিযোগটির একটি ছোট এবং অর্থবহ ৩-৪ লাইনের সারসংক্ষেপ তৈরি করে দাও যাতে কোনো কর্মকর্তা দ্রুত বুঝতে পারেন মূল সমস্যাটি কী: "${text}"`,
-        config: { temperature: 0.7 }
-      });
-      setAiSummary(response.text || "দুঃখিত, সারসংক্ষেপ তৈরি করা যায়নি।");
-    } catch (error) {
-      setAiSummary("AI সার্ভিস এই মুহূর্তে উপলব্ধ নেই।");
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
 
   const handlePrint = () => {
     if (!selectedItem) return;
@@ -161,7 +136,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   </td>
                   <td className="px-10 py-8">
                     <div className="text-sm font-bold text-slate-700 max-w-xs truncate">{item.subject}</div>
-                    <button onClick={() => {setSelectedItem(item); setAiSummary(null);}} className="text-gov-green text-[10px] font-black uppercase tracking-widest hover:text-gov-red mt-3 block transition-colors border-b-2 border-gov-green/20">View Details →</button>
+                    <button onClick={() => {setSelectedItem(item);}} className="text-gov-green text-[10px] font-black uppercase tracking-widest hover:text-gov-red mt-3 block transition-colors border-b-2 border-gov-green/20">View Details →</button>
                   </td>
                   <td className="px-10 py-8 text-center">
                     <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${
@@ -216,32 +191,6 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
                   <p className="font-bold text-slate-800 text-lg font-hind">{selectedItem.address}</p>
                   <p className="text-slate-400 text-xs mt-2 font-medium">{new Date(selectedItem.submittedAt).toLocaleString('bn-BD')}</p>
                 </div>
-              </div>
-
-              {/* AI Summary Section */}
-              <div className="bg-gov-green/5 rounded-[2.5rem] p-10 border border-gov-green/10 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
-                </div>
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="flex items-center gap-3 text-gov-green font-black uppercase text-xs tracking-[0.2em]">
-                    <span className="w-2 h-2 bg-gov-green rounded-full animate-ping"></span>
-                    AI স্মার্ট সারসংক্ষেপ
-                  </h4>
-                  {!aiSummary && !isAiLoading && (
-                    <button onClick={() => generateAiSummary(selectedItem.details)} className="text-[10px] font-black text-white bg-gov-green px-6 py-3 rounded-xl shadow-lg shadow-green-200 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest">Generate AI Summary</button>
-                  )}
-                </div>
-                {isAiLoading ? (
-                  <div className="space-y-4 animate-pulse">
-                    <div className="h-5 bg-gov-green/10 rounded-full w-full"></div>
-                    <div className="h-5 bg-gov-green/10 rounded-full w-[90%]"></div>
-                  </div>
-                ) : aiSummary ? (
-                  <p className="text-gov-green font-bold italic leading-relaxed text-lg font-hind">"{aiSummary}"</p>
-                ) : (
-                  <p className="text-slate-400 text-sm text-center py-4 font-bold uppercase tracking-widest opacity-60">AI সጠቃ করার জন্য উপরের বাটনে ক্লিক করুন</p>
-                )}
               </div>
 
               <div>
