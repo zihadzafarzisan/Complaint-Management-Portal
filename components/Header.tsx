@@ -12,57 +12,57 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange, isAuthenticated, onLogout }) => {
   return (
     <header className="glass-nav border-b shadow-sm sticky top-0 z-40 transition-all duration-300">
-      <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 py-2 md:py-4 flex items-center justify-between gap-3">
         {/* Logo and Name Container */}
-        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0 group">
+        <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0 group">
           <div 
-            className="w-10 h-10 sm:w-14 sm:h-14 flex-shrink-0 flag-container self-center transform group-hover:scale-110 transition-transform cursor-pointer"
+            className="w-10 h-10 md:w-14 md:h-14 flex-shrink-0 flag-container self-center transform group-hover:scale-110 transition-transform cursor-pointer"
             onClick={() => onViewChange('public')}
             title="হোম পেজ"
           >
             {BANGLADESH_LOGO}
           </div>
           <div className="flex flex-col justify-center min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 md:gap-2">
               <a 
                 href="https://abmashrafuddinnizan.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="group/link"
+                className="group/link min-w-0"
               >
-                <h1 className="text-gov-green font-black text-xs sm:text-lg md:text-2xl leading-tight truncate tracking-tight hover:text-gov-red transition-colors cursor-pointer font-hind">
-                  এবিএম আশরাফ উদ্দিন নিজান এর কার্যালয়
+                <h1 className="text-gov-green font-black text-xs sm:text-base md:text-2xl leading-tight truncate tracking-tight hover:text-gov-red transition-colors cursor-pointer font-hind">
+                  এবিএম আশরাফ উদ্দিন নিজান
                 </h1>
               </a>
-              <span className="hidden md:flex items-center gap-1.5 px-2 py-0.5 bg-green-50 text-green-600 rounded-full text-[10px] font-bold border border-green-100 uppercase tracking-widest">
+              <span className="hidden sm:flex items-center gap-1.5 px-1.5 py-0.5 bg-green-50 text-green-600 rounded-full text-[8px] md:text-[10px] font-bold border border-green-100 uppercase tracking-widest flex-shrink-0">
                 Official
               </span>
             </div>
-            <p className="text-slate-500 text-[10px] sm:text-xs md:text-sm font-semibold tracking-wide font-hind">
+            <p className="text-slate-500 text-[8px] sm:text-[10px] md:text-sm font-semibold tracking-wide font-hind truncate">
               সংসদ সদস্য, লক্ষ্মীপুর-৪ নির্বাচনী এলাকা
             </p>
           </div>
         </div>
         
         {/* Navigation */}
-        <nav className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+        <nav className="flex items-center gap-2 md:gap-3 flex-shrink-0">
           <button 
             onClick={() => onViewChange('public')}
-            className={`px-4 py-2.5 rounded-xl text-[11px] sm:text-sm font-black transition-all font-hind ${
+            className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-sm font-black transition-all font-hind whitespace-nowrap ${
               currentView === 'public' 
-              ? 'bg-gov-green text-white shadow-lg shadow-green-200' 
+              ? 'bg-gov-green text-white shadow-md md:shadow-lg shadow-green-200' 
               : 'text-slate-600 hover:bg-slate-50'
             }`}
           >
-            নতুন অভিযোগ
+            হোম
           </button>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             <button 
               onClick={() => onViewChange('admin')}
-              className={`px-4 py-2.5 rounded-xl text-[11px] sm:text-sm font-black transition-all font-hind border-2 ${
+              className={`px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-sm font-black transition-all font-hind border-2 whitespace-nowrap ${
                 currentView === 'admin' 
-                ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-200' 
+                ? 'bg-slate-900 border-slate-900 text-white shadow-md md:shadow-lg shadow-slate-200' 
                 : 'border-slate-100 text-slate-600 hover:border-slate-900 hover:text-slate-900'
               }`}
             >
@@ -72,16 +72,16 @@ export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange, isAut
             {isAuthenticated && (
               <button 
                 onClick={onLogout}
-                className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg md:rounded-xl transition-all"
                 title="লগ আউট"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
               </button>
             )}
           </div>
         </nav>
       </div>
-      <div className="h-1 bg-gradient-to-r from-gov-green via-gov-green to-gov-red w-full"></div>
+      <div className="h-0.5 md:h-1 bg-gradient-to-r from-gov-green via-gov-green to-gov-red w-full"></div>
     </header>
   );
 };

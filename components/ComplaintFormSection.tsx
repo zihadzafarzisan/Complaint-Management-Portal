@@ -110,49 +110,49 @@ export const ComplaintFormSection: React.FC<Props> = ({ status, setStatus, onSuc
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-10 animate-in fade-in duration-700">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div className="space-y-3">
-          <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">আপনার নাম (ঐচ্ছিক)</label>
-          <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="পুরো নাম লিখুন" className="w-full px-6 py-5 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all" />
+    <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10 animate-in fade-in duration-700">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+        <div className="space-y-2 md:space-y-3">
+          <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">আপনার নাম (ঐচ্ছিক)</label>
+          <input type="text" name="name" value={formData.name || ''} onChange={handleChange} placeholder="পুরো নাম লিখুন" className="w-full px-4 md:px-6 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all" />
         </div>
-        <div className="space-y-3">
-          <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">মোবাইল নম্বর <span className="text-gov-red">*</span></label>
-          <input required type="tel" name="mobile" value={formData.mobile || ''} onChange={handleChange} placeholder="০১৮XXXXXXXX" className="w-full px-6 py-5 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all" />
+        <div className="space-y-2 md:space-y-3">
+          <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">মোবাইল নম্বর <span className="text-gov-red">*</span></label>
+          <input required type="tel" name="mobile" value={formData.mobile || ''} onChange={handleChange} placeholder="০১৮XXXXXXXX" className="w-full px-4 md:px-6 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all" />
         </div>
-        <div className="space-y-3">
-          <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">ইউনিয়ন/এলাকা <span className="text-gov-red">*</span></label>
-          <input required type="text" name="address" value={formData.address || ''} onChange={handleChange} placeholder="আপনার এলাকার নাম" className="w-full px-6 py-5 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all" />
+        <div className="space-y-2 md:space-y-3">
+          <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">ইউনিয়ন/এলাকা <span className="text-gov-red">*</span></label>
+          <input required type="text" name="address" value={formData.address || ''} onChange={handleChange} placeholder="আপনার এলাকার নাম" className="w-full px-4 md:px-6 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all" />
         </div>
-        <div className="space-y-3">
-          <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">ইমেল (ঐচ্ছিক)</label>
-          <input type="email" name="email" value={formData.email || ''} onChange={handleChange} placeholder="example@mail.com" className="w-full px-6 py-5 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all" />
+        <div className="space-y-2 md:space-y-3">
+          <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">ইমেল (ঐচ্ছিক)</label>
+          <input type="email" name="email" value={formData.email || ''} onChange={handleChange} placeholder="example@mail.com" className="w-full px-4 md:px-6 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all" />
         </div>
       </div>
 
-      <div className="space-y-3">
-        <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">বিষয় <span className="text-gov-red">*</span></label>
-        <input required type="text" name="subject" value={formData.subject || ''} onChange={handleChange} placeholder="সংক্ষেপে বিষয়টি লিখুন" className="w-full px-6 py-5 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all" />
+      <div className="space-y-2 md:space-y-3">
+        <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">বিষয় <span className="text-gov-red">*</span></label>
+        <input required type="text" name="subject" value={formData.subject || ''} onChange={handleChange} placeholder="সংক্ষেপে বিষয়টি লিখুন" className="w-full px-4 md:px-6 py-4 md:py-5 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all" />
       </div>
 
-      <div className="space-y-3">
-        <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">বিস্তারিত বর্ণনা <span className="text-gov-red">*</span></label>
-        <textarea required name="details" rows={6} value={formData.details || ''} onChange={handleChange} placeholder="আপনার কথা বিস্তারিত লিখুন..." className="w-full px-6 py-6 rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-lg font-hind transition-all resize-none"></textarea>
+      <div className="space-y-2 md:space-y-3">
+        <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">বিস্তারিত বর্ণনা <span className="text-gov-red">*</span></label>
+        <textarea required name="details" rows={5} value={formData.details || ''} onChange={handleChange} placeholder="আপনার কথা বিস্তারিত লিখুন..." className="w-full px-4 md:px-6 py-4 md:py-6 rounded-xl md:rounded-[1.5rem] bg-slate-50 border-none focus:ring-4 focus:ring-gov-green/5 outline-none text-base md:text-lg font-hind transition-all resize-none"></textarea>
       </div>
 
-      <div className="space-y-3">
-        <label className="block text-slate-500 font-black text-xs uppercase tracking-[0.2em] mb-1">সহায়ক ছবি বা নথি (ঐচ্ছিক)</label>
-        <div onClick={() => fileInputRef.current?.click()} className={`flex flex-col items-center justify-center w-full h-48 border-4 border-dashed rounded-[2rem] cursor-pointer transition-all ${fileData ? 'bg-gov-green/5 border-gov-green/20' : 'bg-slate-50 border-slate-100 hover:border-gov-green/20 hover:bg-white'}`}>
-          <div className="flex flex-col items-center justify-center p-8 text-center">
+      <div className="space-y-2 md:space-y-3">
+        <label className="block text-slate-500 font-black text-[10px] md:text-xs uppercase tracking-[0.2em] mb-1">সহায়ক ছবি বা নথি (ঐচ্ছিক)</label>
+        <div onClick={() => fileInputRef.current?.click()} className={`flex flex-col items-center justify-center w-full h-36 md:h-48 border-4 border-dashed rounded-xl md:rounded-[2rem] cursor-pointer transition-all ${fileData ? 'bg-gov-green/5 border-gov-green/20' : 'bg-slate-50 border-slate-100 hover:border-gov-green/20 hover:bg-white'}`}>
+          <div className="flex flex-col items-center justify-center p-4 md:p-8 text-center">
             {fileData ? (
-              <div className="flex flex-col items-center gap-3 text-gov-green font-black">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-lg"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                <span className="text-sm tracking-wide">ফাইল যুক্ত হয়েছে: {fileData.name}</span>
+              <div className="flex flex-col items-center gap-2 md:gap-3 text-gov-green font-black">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl flex items-center justify-center shadow-lg"><svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                <span className="text-xs md:text-sm tracking-wide line-clamp-1">{fileData.name}</span>
               </div>
             ) : (
               <>
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4 text-slate-300 group-hover:text-gov-green transition-colors"><svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
-                <p className="text-sm text-slate-400 font-black uppercase tracking-widest">ক্লিক করে ছবি বা PDF যুক্ত করুন</p>
+                <div className="w-10 h-10 md:w-16 md:h-16 bg-white rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm mb-2 md:mb-4 text-slate-300 group-hover:text-gov-green transition-colors"><svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg></div>
+                <p className="text-[10px] md:text-sm text-slate-400 font-black uppercase tracking-widest">ক্লিক করে ছবি বা PDF যুক্ত করুন</p>
               </>
             )}
           </div>
@@ -160,14 +160,14 @@ export const ComplaintFormSection: React.FC<Props> = ({ status, setStatus, onSuc
         </div>
       </div>
 
-      <div className={`flex items-center gap-5 p-6 rounded-[1.5rem] border-2 transition-all ${formData.isPrivate ? 'bg-gov-red/5 border-gov-red/10' : 'bg-slate-50 border-slate-50'}`}>
+      <div className={`flex items-center gap-3 md:gap-5 p-4 md:p-6 rounded-xl md:rounded-[1.5rem] border-2 transition-all ${formData.isPrivate ? 'bg-gov-red/5 border-gov-red/10' : 'bg-slate-50 border-slate-50'}`}>
         <div className="relative">
-          <input type="checkbox" id="isPrivate" name="isPrivate" checked={formData.isPrivate} onChange={handleChange} className="w-6 h-6 rounded-lg border-slate-300 text-gov-red focus:ring-gov-red cursor-pointer" />
+          <input type="checkbox" id="isPrivate" name="isPrivate" checked={formData.isPrivate} onChange={handleChange} className="w-5 h-5 md:w-6 md:h-6 rounded border-slate-300 text-gov-red focus:ring-gov-red cursor-pointer" />
         </div>
-        <label htmlFor="isPrivate" className="text-sm font-black text-slate-600 cursor-pointer uppercase tracking-widest">তথ্য গোপন রাখতে চাই (শুধুমাত্র অফিস দেখবে)</label>
+        <label htmlFor="isPrivate" className="text-[10px] md:text-sm font-black text-slate-600 cursor-pointer uppercase tracking-widest">তথ্য গোপন রাখতে চাই</label>
       </div>
 
-      <button type="submit" disabled={status.type === 'loading'} className={`w-full py-6 rounded-[1.5rem] text-white font-black text-2xl shadow-2xl transition-all transform hover:scale-[1.01] active:scale-[0.98] ${status.type === 'loading' ? 'bg-slate-300 cursor-not-allowed' : 'bg-gov-red shadow-red-200'}`}>
+      <button type="submit" disabled={status.type === 'loading'} className={`w-full py-4 md:py-6 rounded-xl md:rounded-[1.5rem] text-white font-black text-lg md:text-2xl shadow-xl md:shadow-2xl transition-all transform hover:scale-[1.01] active:scale-[0.98] ${status.type === 'loading' ? 'bg-slate-300 cursor-not-allowed' : 'bg-gov-red shadow-red-100'}`}>
         {status.type === 'loading' ? 'প্রেরণ করা হচ্ছে...' : 'মতামত পাঠান'}
       </button>
     </form>
