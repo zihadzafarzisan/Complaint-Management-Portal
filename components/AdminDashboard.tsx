@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { ComplaintForm } from '../types';
 import { db } from '../services/db';
 
@@ -7,20 +7,27 @@ interface Props {
   onLogout?: () => void;
 }
 
+const ITEMS_PER_PAGE = 8;
+
 export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
   const [items, setItems] = useState<ComplaintForm[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState<ComplaintForm | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'solved' | 'rejected'>('all');
 
   const refreshData = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true);
+    setError(null);
     try {
       const data = await db.getAllComplaints();
       setItems(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to refresh data:", err);
+      setError("ডেটা লোড করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।");
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -51,9 +58,9 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
     if (!selectedItem) return;
     try {
       await db.updateFeedback(selectedItem.id, feedbackText);
-      alert('ফিডব্যাক সফলভাবে সংরক্ষিত হয়েছে।');
-      setSelectedItem(prev => ({ ...prev!, adminFeedback: feedbackText }));
+      setSelectedItem(prev => prev ? { ...prev, adminFeedback: feedbackText } : null);
       setItems(prev => prev.map(i => i.id === selectedItem.id ? { ...i, adminFeedback: feedbackText } : i));
+      alert('ফিডব্যাক সফলভাবে সংরক্ষিত হয়েছে।');
     } catch (err) {
       alert('ফিডব্যাক সেভ করতে সমস্যা হয়েছে।');
     }
@@ -66,6 +73,7 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
       if (selectedItem?.id === id) {
         setSelectedItem(prev => prev ? { ...prev, status } : null);
       }
+      alert('অবস্থা আপডেট হয়েছে।');
     } catch (err) {
       alert('অবস্থা আপডেট করতে সমস্যা হয়েছে।');
     }
@@ -74,90 +82,183 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
   const handlePrint = () => {
     if (!selectedItem) return;
     const printContent = `
-      <div style="font-family: 'Hind Siliguri', sans-serif; padding: 40px; line-height: 1.6; color: #1e293b;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #006a4e; margin-bottom: 5px;">এবিএম আশরাফ উদ্দিন নিজান এর কার্যালয়</h1>
-          <p style="margin: 0; font-weight: bold; color: #64748b;">ডিজিটাল অভিযোগ নিস্পত্তি রিপোর্ট</p>
+      <div style="font-family: 'Hind Siliguri', sans-serif; padding: 40px; line-height: 1.6; color: #1e293b; max-width: 800px; margin: auto;">
+        <div style="text-align: center; margin-bottom: 40px; border-bottom: 2px solid #006a4e; padding-bottom: 20px;">
+          <h1 style="color: #006a4e; margin-bottom: 5px; font-size: 28px;">এবিএম আশরাফ উদ্দিন নিজান এর কার্যালয়</h1>
+          <p style="margin: 0; font-weight: bold; color: #64748b; font-size: 16px;">সংসদ সদস্য, লক্ষ্মীপুর-৪ নির্বাচনী এলাকা</p>
+          <div style="margin-top: 10px; font-weight: 900; color: #f42a41; text-transform: uppercase; letter-spacing: 2px;">ডিজিটাল অভিযোগ নিস্পত্তি কার্ড</div>
         </div>
-        <div style="border: 2px solid #e2e8f0; border-radius: 15px; padding: 30px;">
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
-            <tr><td style="padding: 10px 0; width: 160px;"><strong>ট্র্যাকিং আইডি:</strong></td><td>${selectedItem.id}</td></tr>
-            <tr><td style="padding: 10px 0;"><strong>আবেদনকারী:</strong></td><td>${selectedItem.name}</td></tr>
-            <tr><td style="padding: 10px 0;"><strong>মোবাইল:</strong></td><td>${selectedItem.mobile}</td></tr>
-            <tr><td style="padding: 10px 0;"><strong>ঠিকানা:</strong></td><td>${selectedItem.address}</td></tr>
-            <tr><td style="padding: 10px 0;"><strong>তারিখ:</strong></td><td>${new Date(selectedItem.submittedAt).toLocaleString('bn-BD')}</td></tr>
-            <tr><td style="padding: 10px 0;"><strong>অবস্থা:</strong></td><td>${selectedItem.status === 'solved' ? 'সমাধানকৃত' : selectedItem.status === 'rejected' ? 'বাতিলকৃত' : 'প্রক্রিয়াধীন'}</td></tr>
-          </table>
-          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-          <h3>বিষয়: ${selectedItem.subject}</h3>
-          <p style="white-space: pre-wrap; background: #f8fafc; padding: 20px; border-radius: 10px; border: 1px solid #f1f5f9;">${selectedItem.details}</p>
-          ${selectedItem.adminFeedback ? `
-          <div style="margin-top: 30px; border: 1px solid #fbbf24; background: #fffdf5; padding: 20px; border-radius: 10px;">
-            <h4 style="margin-top: 0;">অফিসিয়াল ডিসিশন ও ফিডব্যাক:</h4>
-            <p>${selectedItem.adminFeedback}</p>
-          </div>` : ''}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+             <p style="margin: 0 0 10px 0; font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">আবেদনকারীর তথ্য</p>
+             <h2 style="margin: 0; font-size: 20px; color: #1e293b;">${selectedItem.name}</h2>
+             <p style="margin: 5px 0; color: #006a4e; font-weight: bold;">${selectedItem.mobile}</p>
+             <p style="margin: 5px 0; font-size: 14px;">ঠিকানা: ${selectedItem.address}</p>
+          </div>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
+             <p style="margin: 0 0 10px 0; font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase;">ফাইলের তথ্য</p>
+             <p style="margin: 5px 0; font-size: 14px;">ট্র্যাকিং আইডি: <strong>${selectedItem.id}</strong></p>
+             <p style="margin: 5px 0; font-size: 14px;">তারিখ: <strong>${new Date(selectedItem.submittedAt).toLocaleString('bn-BD')}</strong></p>
+             <p style="margin: 5px 0; font-size: 14px;">অবস্থা: <strong>${selectedItem.status === 'solved' ? 'সমাধানকৃত' : selectedItem.status === 'rejected' ? 'বাতিলকৃত' : 'প্রক্রিয়াধীন'}</strong></p>
+          </div>
         </div>
-        <div style="margin-top: 60px; display: flex; justify-content: space-between;">
-           <div style="text-align: center;"><p>___________________</p><p>সাক্ষর</p></div>
-           <div style="text-align: center;"><p>___________________</p><p>অনুমোদন</p></div>
+
+        <div style="margin-bottom: 30px;">
+          <h3 style="margin: 0 0 15px 0; font-size: 18px; border-left: 4px solid #f42a41; padding-left: 15px;">বিষয়: ${selectedItem.subject}</h3>
+          <div style="background: #ffffff; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; min-height: 150px; white-space: pre-wrap;">${selectedItem.details}</div>
+        </div>
+
+        ${selectedItem.adminFeedback ? `
+        <div style="margin-top: 30px; background: #fffbeb; padding: 25px; border-radius: 12px; border: 1px solid #fef3c7;">
+          <h4 style="margin: 0 0 10px 0; color: #92400e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">অফিসিয়াল সিদ্ধান্ত ও ফিডব্যাক</h4>
+          <p style="margin: 0; font-size: 16px; color: #451a03;">${selectedItem.adminFeedback}</p>
+        </div>` : ''}
+
+        <div style="margin-top: 80px; display: flex; justify-content: space-between;">
+           <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 14px; font-weight: bold;">সাক্ষর (কর্তৃপক্ষ)</div></div>
+           <div style="text-align: center; width: 200px;"><div style="border-top: 1px solid #cbd5e1; padding-top: 10px; font-size: 14px; font-weight: bold;">তারিখ</div></div>
+        </div>
+        
+        <div style="margin-top: 50px; text-align: center; font-size: 10px; color: #94a3b8;">
+          এটি একটি ডিজিটাল কপি এবং এটি সিস্টেম দ্বারা প্রস্তুতকৃত।
         </div>
       </div>
     `;
     const win = window.open('', '_blank');
     if (win) {
-      win.document.write(`<html><head><title>CaseFile-${selectedItem.id}</title></head><body onload="window.print(); window.close();">${printContent}</body></html>`);
+      win.document.write(`<html><head><title>Complaint_Report_${selectedItem.id}</title><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri&display=swap" rel="stylesheet"></head><body style="margin:0;">${printContent}</body></html>`);
       win.document.close();
+      setTimeout(() => {
+        win.focus();
+        win.print();
+      }, 700);
     }
   };
 
-  const filteredItems = items.filter(item => {
-    const cleanSearch = searchTerm.trim().toLowerCase();
-    return (item.subject || '').toLowerCase().includes(cleanSearch) || 
-           (item.mobile || '').includes(cleanSearch) || 
-           (item.name?.toLowerCase().includes(cleanSearch));
-  });
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      const cleanSearch = searchTerm.trim().toLowerCase();
+      const matchesSearch = (item.subject || '').toLowerCase().includes(cleanSearch) || 
+                            (item.mobile || '').includes(cleanSearch) || 
+                            (item.name?.toLowerCase().includes(cleanSearch));
+      const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [items, searchTerm, statusFilter]);
+
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredItems.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredItems, currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   return (
     <div className="view-transition">
-      {/* Search Bar */}
-      <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-slate-100 mb-8 flex items-center">
-        <div className="relative flex-1">
-          <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <input 
-            type="text" 
-            placeholder="নাম বা মোবাইল দিয়ে খুঁজুন..." 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
-            className="w-full pl-12 pr-6 py-4 rounded-xl bg-slate-50 border-none outline-none font-hind"
-          />
+      {/* List Header Controls */}
+      <div className="bg-white p-4 md:p-8 rounded-[2rem] shadow-sm border border-slate-100 mb-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+           <div>
+              <h2 className="text-2xl font-black text-slate-800 font-hind">অভিযোগ ব্যবস্থাপনা</h2>
+              <p className="text-slate-400 text-sm font-hind">সকল জমা পড়া অভিযোগ এবং তাদের বর্তমান অবস্থা</p>
+           </div>
+           <div className="flex items-center gap-3">
+              <div className="px-5 py-2 bg-gov-green/5 text-gov-green rounded-full font-black text-xs uppercase tracking-widest border border-gov-green/10">
+                Total: {items.length}
+              </div>
+              <button onClick={() => refreshData()} className="p-2 text-slate-400 hover:text-gov-green transition-colors">
+                <svg className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              </button>
+           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 relative">
+            <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input 
+              type="text" 
+              placeholder="নাম, মোবাইল বা বিষয় লিখে খুঁজুন..." 
+              value={searchTerm} 
+              onChange={(e) => setSearchTerm(e.target.value)} 
+              className="w-full pl-12 pr-6 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-gov-green focus:bg-white outline-none font-hind transition-all shadow-inner"
+            />
+          </div>
+          <div className="flex gap-2">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+              className="w-full px-4 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-gov-green outline-none font-hind font-bold text-slate-600 cursor-pointer shadow-inner"
+            >
+              <option value="all">সবগুলো স্ট্যাটাস</option>
+              <option value="pending">প্রক্রিয়াধীন</option>
+              <option value="solved">সমাধানকৃত</option>
+              <option value="rejected">বাতিলকৃত</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* List Table */}
-      <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100">
+      {/* Main Table Area */}
+      {error && (
+        <div className="mb-8 p-6 bg-red-50 border-2 border-red-100 rounded-2xl flex items-center gap-4 text-red-600 font-hind animate-in slide-in-from-top-4">
+          <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          <p className="font-bold flex-1">{error}</p>
+          <button onClick={() => refreshData()} className="px-4 py-2 bg-red-600 text-white rounded-lg font-black text-xs uppercase tracking-widest hover:bg-red-700 transition-colors">Retry</button>
+        </div>
+      )}
+
+      <div className="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-100 min-h-[400px]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px]">
-            <thead className="bg-slate-50/50 text-slate-400 text-[12px] uppercase font-black tracking-widest border-b border-slate-100">
+          <table className="w-full min-w-[700px]">
+            <thead className="bg-slate-50/50 text-slate-400 text-[10px] md:text-[12px] uppercase font-black tracking-[0.2em] border-b border-slate-100">
               <tr>
                 <th className="px-8 py-6 text-left">আবেদনকারী</th>
-                <th className="px-8 py-6 text-left">বিষয়</th>
+                <th className="px-8 py-6 text-left">বিষয় ও বিবরণ</th>
+                <th className="px-8 py-6 text-center">অবস্থা</th>
                 <th className="px-8 py-6 text-right">ম্যানেজ</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {filteredItems.map(item => (
-                <tr key={item.id} className={`hover:bg-slate-50 transition-all ${!item.isRead ? 'bg-gov-green/5' : ''}`}>
-                  <td className="px-8 py-6">
-                    <div className="font-bold text-slate-800 font-hind">{item.name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono tracking-tighter">{item.mobile} | ID: {item.id}</div>
+              {loading ? (
+                Array.from({ length: 6 }).map((_, idx) => (
+                  <tr key={idx} className="animate-pulse">
+                    <td className="px-8 py-7"><div className="h-4 bg-slate-100 rounded w-24 mb-2"></div><div className="h-3 bg-slate-50 rounded w-32"></div></td>
+                    <td className="px-8 py-7"><div className="h-4 bg-slate-100 rounded w-48 mb-2"></div><div className="h-3 bg-slate-50 rounded w-20"></div></td>
+                    <td className="px-8 py-7"><div className="h-6 bg-slate-100 rounded-full w-16 mx-auto"></div></td>
+                    <td className="px-8 py-7 text-right"><div className="h-10 bg-slate-100 rounded-xl w-24 ml-auto"></div></td>
+                  </tr>
+                ))
+              ) : paginatedItems.map(item => (
+                <tr key={item.id} className={`hover:bg-slate-50/70 transition-all group ${!item.isRead ? 'bg-gov-green/[0.03]' : ''}`}>
+                  <td className="px-8 py-7">
+                    <div className="flex items-center gap-3">
+                       {!item.isRead && <div className="w-2.5 h-2.5 bg-gov-red rounded-full shadow-sm ring-4 ring-red-50"></div>}
+                       <div>
+                          <div className={`text-base md:text-lg ${!item.isRead ? 'font-black text-slate-900' : 'font-bold text-slate-700'} font-hind`}>{item.name}</div>
+                          <div className="text-[11px] text-slate-400 font-mono tracking-widest">{item.mobile}</div>
+                       </div>
+                    </div>
                   </td>
-                  <td className="px-8 py-6">
-                    <div className="text-sm text-slate-600 font-hind truncate max-w-xs">{item.subject}</div>
+                  <td className="px-8 py-7">
+                    <div className="text-sm font-bold text-slate-600 font-hind truncate max-w-xs">{item.subject}</div>
+                    <div className="text-[10px] text-slate-300 mt-1 uppercase font-black tracking-widest">{new Date(item.submittedAt).toLocaleDateString('bn-BD')}</div>
                   </td>
-                  <td className="px-8 py-6 text-right">
+                  <td className="px-8 py-7 text-center">
+                    <span className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest inline-block shadow-sm ${
+                      item.status === 'solved' ? 'bg-emerald-100 text-emerald-700' : 
+                      item.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {item.status === 'solved' ? 'Solved' : item.status === 'rejected' ? 'Rejected' : 'Pending'}
+                    </span>
+                  </td>
+                  <td className="px-8 py-7 text-right">
                     <button 
                       onClick={() => handleOpenDetails(item)} 
-                      className="px-5 py-2.5 bg-slate-900 text-white text-[10px] font-black rounded-lg hover:bg-gov-green transition-all uppercase tracking-widest"
+                      className="px-6 py-2.5 bg-slate-900 text-white text-[10px] font-black rounded-xl hover:bg-gov-green transition-all uppercase tracking-widest shadow-md active:scale-95 group-hover:-translate-x-1"
                     >
                       Case File
                     </button>
@@ -166,108 +267,178 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
               ))}
             </tbody>
           </table>
+          {!loading && paginatedItems.length === 0 && (
+            <div className="py-32 text-center bg-slate-50/20">
+              <div className="w-20 h-20 bg-slate-100 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-300">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.183.445V20a2 2 0 002 2h11.429a2 2 0 002-2v-4.572zM12 2a5 5 0 00-5 5v2a5 5 0 0010 0V7a5 5 0 00-5-5z"/></svg>
+              </div>
+              <p className="text-slate-400 font-hind font-black text-xl">কোনো তথ্য খুঁজে পাওয়া যায়নি</p>
+              <button onClick={() => {setSearchTerm(''); setStatusFilter('all');}} className="mt-4 text-gov-green font-bold text-sm underline">রিসেট করুন</button>
+            </div>
+          )}
         </div>
+
+        {/* Footer Pagination */}
+        {!loading && totalPages > 1 && (
+          <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Page {currentPage} of {totalPages}</span>
+            <div className="flex gap-3">
+              <button 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-gov-green disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-lg transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <button 
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-gov-green disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-lg transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Details Modal */}
+      {/* Case File Page (Modal View) - IMPROVED BACKGROUND BLUR & ALIGNMENT */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 md:p-10 z-[200] animate-in fade-in overflow-hidden">
-          <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] flex flex-col relative overflow-hidden">
+        <div className="fixed inset-0 bg-white/40 backdrop-blur-3xl flex items-center justify-center p-0 md:p-8 z-[200] animate-in fade-in duration-300">
+          <div className="bg-white md:rounded-[2.5rem] shadow-2xl w-full max-w-3xl h-full md:h-auto md:max-h-[95vh] flex flex-col relative overflow-hidden transform animate-in zoom-in-95 duration-300">
             
-            {/* FIXED CLOSE BUTTON (Top Right) */}
-            <button 
-              onClick={() => setSelectedItem(null)} 
-              className="absolute top-4 right-4 md:top-6 md:right-6 w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all z-[250]"
-            >
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-
-            {/* Modal Header */}
-            <div className="p-8 border-b bg-slate-50 shrink-0 pr-20">
-              <h3 className="text-2xl md:text-3xl font-black text-slate-900 font-hind">অভিযোগের ফাইল কার্ড</h3>
-              <p className="text-slate-400 font-mono text-xs uppercase tracking-widest mt-1">ID: {selectedItem.id}</p>
+            {/* Header Area - Cleaned up alignment and badge */}
+            <div className="px-6 py-4 md:px-10 md:py-6 border-b bg-slate-50/50 backdrop-blur-sm shrink-0 flex items-center justify-between relative">
+               <div className="flex items-center gap-4 relative">
+                  <button 
+                    onClick={() => setSelectedItem(null)}
+                    className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-slate-500 hover:text-gov-green border border-slate-200 shadow-sm transition-all active:scale-90"
+                    title="পিছনে যান"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                  </button>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-3">
+                       <h3 className="text-xl md:text-2xl font-black text-slate-900 font-hind">অভিযোগের ফাইল কার্ড</h3>
+                       <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm ${
+                         selectedItem.status === 'solved' ? 'bg-emerald-100 text-emerald-700' : 
+                         selectedItem.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                       }`}>
+                         {selectedItem.status === 'solved' ? 'Solved' : selectedItem.status === 'rejected' ? 'Rejected' : 'Pending'}
+                       </span>
+                    </div>
+                    <p className="text-slate-400 font-mono text-[9px] uppercase tracking-[0.2em] mt-0.5">Tracking ID: {selectedItem.id}</p>
+                  </div>
+               </div>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-8">
-                  <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">আবেদনকারীর প্রোফাইল</p>
-                    <div className="text-xl font-black text-slate-900 font-hind">{selectedItem.name}</div>
-                    <div className="text-gov-green font-bold mb-4">{selectedItem.mobile}</div>
-                    <div className="text-sm text-slate-600 font-hind">ঠিকানা: {selectedItem.address}</div>
-                  </div>
+            {/* Scrollable Content View */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
+              <div className="grid grid-cols-1 gap-8">
+                
+                {/* Applicant Info Section */}
+                <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">আবেদনকারীর তথ্য</p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-xl font-black text-slate-900 font-hind">{selectedItem.name}</h4>
+                        <p className="text-gov-green font-black text-base font-mono tracking-widest mt-0.5">{selectedItem.mobile}</p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 md:pt-0 md:border-l border-slate-200/50 md:pl-8">
+                         <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 shrink-0 shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                            <div className="min-w-0">
+                               <p className="text-[8px] uppercase font-black text-slate-400">ঠিকানা</p>
+                               <p className="text-xs font-bold text-slate-700 font-hind truncate">{selectedItem.address}</p>
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 shrink-0 shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                            <div><p className="text-[8px] uppercase font-black text-slate-400">তারিখ</p><p className="text-xs font-bold text-slate-700 font-hind">{new Date(selectedItem.submittedAt).toLocaleDateString('bn-BD')}</p></div>
+                         </div>
+                      </div>
+                    </div>
+                </div>
 
-                  {selectedItem.attachmentData && (
-                    <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">সংযুক্ত নথি</p>
+                {/* Complaint Details Section */}
+                <div className="bg-white p-6 md:p-8 rounded-[2rem] border-2 border-slate-50 shadow-sm relative">
+                    <div className="absolute top-0 left-8 -translate-y-1/2 bg-gov-red text-white px-5 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest shadow-md">বিষয়বস্তু</div>
+                    <h4 className="text-lg md:text-xl font-black text-slate-900 font-hind mb-4 leading-tight">বিষয়: {selectedItem.subject}</h4>
+                    <div className="text-slate-700 font-hind text-base leading-relaxed whitespace-pre-wrap">
+                      {selectedItem.details}
+                    </div>
+                </div>
+
+                {/* Attachment Section */}
+                {selectedItem.attachmentData && (
+                    <div className="bg-white p-6 rounded-[2rem] border-2 border-slate-50 shadow-inner">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">সংযুক্ত নথি</p>
                       {selectedItem.attachmentType?.startsWith('image/') ? (
-                        <img src={selectedItem.attachmentData} className="w-full rounded-xl shadow-md border-4 border-white" alt="Evidence" />
+                        <div className="rounded-2xl overflow-hidden border-4 border-slate-50 shadow-lg max-w-sm mx-auto group cursor-pointer hover:scale-[1.01] transition-transform">
+                          <img src={selectedItem.attachmentData} className="w-full h-auto" alt="Case Attachment" />
+                        </div>
                       ) : (
-                        <a href={selectedItem.attachmentData} download={selectedItem.attachmentName} className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm">
-                          <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
-                          <span className="font-bold text-slate-700 truncate">{selectedItem.attachmentName}</span>
+                        <a href={selectedItem.attachmentData} download={selectedItem.attachmentName} className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 group transition-all hover:bg-white">
+                          <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-all">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-800 font-hind truncate text-sm">{selectedItem.attachmentName}</p>
+                            <p className="text-[8px] font-black text-slate-400 uppercase">Download PDF</p>
+                          </div>
                         </a>
                       )}
                     </div>
-                  )}
-                </div>
+                )}
 
-                <div className="space-y-8">
-                  <div className="bg-white p-8 rounded-2xl border-2 border-slate-50 shadow-sm">
-                    <h4 className="text-lg font-black text-slate-900 font-hind mb-3">বিষয়: {selectedItem.subject}</h4>
-                    <p className="text-slate-700 font-hind leading-relaxed whitespace-pre-wrap">{selectedItem.details}</p>
-                  </div>
-
-                  {/* Feedback Area (FIXED EDITABILITY) */}
-                  <div className="bg-amber-50 p-8 rounded-2xl border border-amber-200 space-y-4 shadow-inner">
-                    <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest">অফিসিয়াল ডিসিশন ও ফিডব্যাক</label>
+                {/* Feedback Action Section */}
+                <div className="bg-amber-50/70 p-6 md:p-8 rounded-[2rem] border-2 border-amber-100/50 space-y-4 shadow-inner relative">
+                    <label className="text-[9px] font-black text-amber-700 uppercase tracking-widest block">অফিসিয়াল ফিডব্যাক</label>
                     <textarea 
                       value={feedbackText}
                       onChange={(e) => setFeedbackText(e.target.value)}
-                      placeholder="গৃহীত ব্যবস্থা এখানে লিখুন..."
-                      className="w-full p-4 rounded-xl bg-white border-2 border-transparent focus:border-gov-green outline-none font-hind text-base min-h-[120px] resize-none cursor-text shadow-sm"
+                      placeholder="মতামত এখানে লিখুন..."
+                      className="w-full p-4 rounded-2xl bg-white border-2 border-transparent focus:border-gov-green outline-none font-hind text-sm md:text-base min-h-[120px] resize-none shadow-sm"
                     ></textarea>
                     <div className="flex justify-end">
                       <button 
                         onClick={handleSaveFeedback}
-                        className="px-6 py-2.5 bg-slate-900 text-white text-[10px] font-black rounded-lg hover:bg-gov-green transition-all uppercase tracking-widest"
+                        className="px-6 py-3 bg-slate-900 text-white text-[10px] font-black rounded-xl hover:bg-gov-green transition-all uppercase tracking-widest active:scale-95"
                       >
                         Update Feedback
                       </button>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Modal Footer (Status & Print) */}
-            <div className="p-8 border-t bg-slate-50 shrink-0 flex flex-wrap gap-4 items-center justify-between">
-              <div className="flex gap-3 flex-1">
+            {/* Bottom Sticky Action Bar - REMOVED PICHONE JAN BUTTON AS REQUESTED */}
+            <div className="p-6 md:p-8 border-t bg-white/90 backdrop-blur-3xl shrink-0 flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex gap-3 flex-1 min-w-[200px]">
                 <button 
                   onClick={() => handleStatusUpdate(selectedItem.id, 'solved')}
-                  className={`flex-1 py-4 rounded-xl font-black font-hind text-lg transition-all shadow-md ${
-                    selectedItem.status === 'solved' ? 'bg-emerald-600 text-white' : 'bg-white border-2 border-emerald-100 text-emerald-600 hover:bg-emerald-50'
+                  className={`flex-1 py-4 rounded-2xl font-black font-hind text-base transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ${
+                    selectedItem.status === 'solved' ? 'bg-emerald-600 text-white shadow-emerald-200' : 'bg-white border-2 border-emerald-100 text-emerald-600 hover:bg-emerald-50'
                   }`}
                 >
                   সমাধানকৃত
                 </button>
                 <button 
                   onClick={() => handleStatusUpdate(selectedItem.id, 'rejected')}
-                  className={`flex-1 py-4 rounded-xl font-black font-hind text-lg transition-all shadow-md ${
-                    selectedItem.status === 'rejected' ? 'bg-red-500 text-white' : 'bg-white border-2 border-red-100 text-red-500 hover:bg-red-50'
+                  className={`flex-1 py-4 rounded-2xl font-black font-hind text-base transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ${
+                    selectedItem.status === 'rejected' ? 'bg-gov-red text-white shadow-red-200' : 'bg-white border-2 border-red-100 text-gov-red hover:bg-red-50'
                   }`}
                 >
                   বাতিল করুন
                 </button>
               </div>
+              
               <button 
                 onClick={handlePrint}
-                className="px-10 py-4 bg-white border-2 border-slate-200 rounded-xl hover:bg-slate-900 hover:text-white transition-all flex items-center gap-2 font-black text-xs uppercase tracking-widest shadow-md"
+                className="w-full md:w-auto px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-widest"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Print Report
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Print Card
               </button>
             </div>
           </div>
