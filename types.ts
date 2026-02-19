@@ -10,10 +10,12 @@ export interface ComplaintForm {
   isPrivate: boolean;
   status: 'pending' | 'solved' | 'rejected';
   submittedAt: string;
-  deletedAt?: string; // Timestamp when moved to recycle bin
+  deletedAt?: string;
   attachmentName?: string;
-  attachmentData?: string; // Base64 string of the file
-  attachmentType?: string; // MIME type of the file
+  attachmentData?: string;
+  attachmentType?: string;
+  adminFeedback?: string; // New field for admin comments
+  isRead?: boolean;       // New field to track unread complaints
 }
 
 export interface SubmissionStatus {
