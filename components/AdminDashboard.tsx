@@ -302,140 +302,125 @@ export const AdminDashboard: React.FC<Props> = ({ onLogout }) => {
         )}
       </div>
 
-      {/* Case File Page (Modal View) - IMPROVED BACKGROUND BLUR & ALIGNMENT */}
+      {/* Case File Page (Modal View) - PERFECT VISIBILITY AND CENTERED */}
       {selectedItem && (
-        <div className="fixed inset-0 bg-white/40 backdrop-blur-3xl flex items-center justify-center p-0 md:p-8 z-[200] animate-in fade-in duration-300">
-          <div className="bg-white md:rounded-[2.5rem] shadow-2xl w-full max-w-3xl h-full md:h-auto md:max-h-[95vh] flex flex-col relative overflow-hidden transform animate-in zoom-in-95 duration-300">
-            
-            {/* Header Area - Cleaned up alignment and badge */}
-            <div className="px-6 py-4 md:px-10 md:py-6 border-b bg-slate-50/50 backdrop-blur-sm shrink-0 flex items-center justify-between relative">
-               <div className="flex items-center gap-4 relative">
-                  <button 
-                    onClick={() => setSelectedItem(null)}
-                    className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-2xl flex items-center justify-center text-slate-500 hover:text-gov-green border border-slate-200 shadow-sm transition-all active:scale-90"
-                    title="পিছনে যান"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                  </button>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-3">
-                       <h3 className="text-xl md:text-2xl font-black text-slate-900 font-hind">অভিযোগের ফাইল কার্ড</h3>
-                       <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm ${
-                         selectedItem.status === 'solved' ? 'bg-emerald-100 text-emerald-700' : 
-                         selectedItem.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                       }`}>
-                         {selectedItem.status === 'solved' ? 'Solved' : selectedItem.status === 'rejected' ? 'Rejected' : 'Pending'}
-                       </span>
-                    </div>
-                    <p className="text-slate-400 font-mono text-[9px] uppercase tracking-[0.2em] mt-0.5">Tracking ID: {selectedItem.id}</p>
-                  </div>
-               </div>
+        <div 
+          className="fixed inset-0 bg-slate-500/30 backdrop-blur-md flex items-center justify-center p-4 z-[9999] opacity-100 transition-all"
+          onClick={() => setSelectedItem(null)}
+        >
+          <div 
+            className="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col relative overflow-hidden transform scale-100 opacity-100 transition-all border border-slate-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Area */}
+            <div className="px-6 py-4 md:px-10 md:py-6 border-b bg-slate-50/80 shrink-0 flex items-center gap-4">
+              <button 
+                onClick={() => setSelectedItem(null)}
+                className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-500 hover:text-gov-green border border-slate-200 shadow-sm transition-all active:scale-90"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+              </button>
+              <div className="flex flex-col flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg md:text-xl font-black text-slate-900 font-hind truncate">অভিযোগের ফাইল কার্ড</h3>
+                  <span className={`px-3 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest inline-block ${
+                    selectedItem.status === 'solved' ? 'bg-emerald-100 text-emerald-700' : 
+                    selectedItem.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {selectedItem.status === 'solved' ? 'Solved' : selectedItem.status === 'rejected' ? 'Rejected' : 'Pending'}
+                  </span>
+                </div>
+                <p className="text-slate-400 font-mono text-[9px] uppercase tracking-[0.2em] mt-0.5 truncate">Tracking ID: {selectedItem.id}</p>
+              </div>
             </div>
 
             {/* Scrollable Content View */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8">
-              <div className="grid grid-cols-1 gap-8">
-                
-                {/* Applicant Info Section */}
-                <div className="bg-slate-50 p-6 md:p-8 rounded-[2rem] border border-slate-100 shadow-sm">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4">আবেদনকারীর তথ্য</p>
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <h4 className="text-xl font-black text-slate-900 font-hind">{selectedItem.name}</h4>
-                        <p className="text-gov-green font-black text-base font-mono tracking-widest mt-0.5">{selectedItem.mobile}</p>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 md:pt-0 md:border-l border-slate-200/50 md:pl-8">
-                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 shrink-0 shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                            <div className="min-w-0">
-                               <p className="text-[8px] uppercase font-black text-slate-400">ঠিকানা</p>
-                               <p className="text-xs font-bold text-slate-700 font-hind truncate">{selectedItem.address}</p>
-                            </div>
-                         </div>
-                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-slate-400 shrink-0 shadow-sm"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-                            <div><p className="text-[8px] uppercase font-black text-slate-400">তারিখ</p><p className="text-xs font-bold text-slate-700 font-hind">{new Date(selectedItem.submittedAt).toLocaleDateString('bn-BD')}</p></div>
-                         </div>
-                      </div>
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-white">
+              {/* Applicant Info */}
+              <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">আবেদনকারীর প্রোফাইল</p>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-lg font-black text-slate-900 font-hind">{selectedItem.name}</h4>
+                      <p className="text-gov-green font-black text-base font-mono mt-0.5">{selectedItem.mobile}</p>
                     </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:border-l border-slate-200 md:pl-6">
+                       <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                          <p className="text-xs font-bold text-slate-600 font-hind truncate max-w-[150px]">{selectedItem.address}</p>
+                       </div>
+                       <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                          <p className="text-xs font-bold text-slate-600 font-hind">{new Date(selectedItem.submittedAt).toLocaleDateString('bn-BD')}</p>
+                       </div>
+                    </div>
+                  </div>
+              </div>
+
+              {/* Subject & Details */}
+              <div className="space-y-4">
+                <div className="inline-block bg-gov-red text-white px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest">বিষয়বস্তু</div>
+                <h4 className="text-base md:text-lg font-black text-slate-900 font-hind leading-tight">বিষয়: {selectedItem.subject}</h4>
+                <div className="text-slate-700 font-hind text-base leading-relaxed whitespace-pre-wrap p-4 bg-slate-50/50 rounded-xl border border-slate-100">
+                  {selectedItem.details}
                 </div>
+              </div>
 
-                {/* Complaint Details Section */}
-                <div className="bg-white p-6 md:p-8 rounded-[2rem] border-2 border-slate-50 shadow-sm relative">
-                    <div className="absolute top-0 left-8 -translate-y-1/2 bg-gov-red text-white px-5 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest shadow-md">বিষয়বস্তু</div>
-                    <h4 className="text-lg md:text-xl font-black text-slate-900 font-hind mb-4 leading-tight">বিষয়: {selectedItem.subject}</h4>
-                    <div className="text-slate-700 font-hind text-base leading-relaxed whitespace-pre-wrap">
-                      {selectedItem.details}
+              {/* Attachment */}
+              {selectedItem.attachmentData && (
+                <div className="pt-4">
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">সংযুক্ত নথি</p>
+                  {selectedItem.attachmentType?.startsWith('image/') ? (
+                    <div className="rounded-xl overflow-hidden border border-slate-100 shadow-md max-w-sm mx-auto">
+                      <img src={selectedItem.attachmentData} className="w-full h-auto" alt="Attachment" />
                     </div>
+                  ) : (
+                    <a href={selectedItem.attachmentData} download={selectedItem.attachmentName} className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 hover:bg-white transition-all">
+                      <div className="w-10 h-10 bg-red-50 text-red-500 rounded-lg flex items-center justify-center shrink-0 font-bold">PDF</div>
+                      <span className="font-bold text-slate-700 font-hind truncate text-sm">{selectedItem.attachmentName}</span>
+                    </a>
+                  )}
                 </div>
+              )}
 
-                {/* Attachment Section */}
-                {selectedItem.attachmentData && (
-                    <div className="bg-white p-6 rounded-[2rem] border-2 border-slate-50 shadow-inner">
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">সংযুক্ত নথি</p>
-                      {selectedItem.attachmentType?.startsWith('image/') ? (
-                        <div className="rounded-2xl overflow-hidden border-4 border-slate-50 shadow-lg max-w-sm mx-auto group cursor-pointer hover:scale-[1.01] transition-transform">
-                          <img src={selectedItem.attachmentData} className="w-full h-auto" alt="Case Attachment" />
-                        </div>
-                      ) : (
-                        <a href={selectedItem.attachmentData} download={selectedItem.attachmentName} className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 group transition-all hover:bg-white">
-                          <div className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-all">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"/></svg>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-slate-800 font-hind truncate text-sm">{selectedItem.attachmentName}</p>
-                            <p className="text-[8px] font-black text-slate-400 uppercase">Download PDF</p>
-                          </div>
-                        </a>
-                      )}
-                    </div>
-                )}
-
-                {/* Feedback Action Section */}
-                <div className="bg-amber-50/70 p-6 md:p-8 rounded-[2rem] border-2 border-amber-100/50 space-y-4 shadow-inner relative">
-                    <label className="text-[9px] font-black text-amber-700 uppercase tracking-widest block">অফিসিয়াল ফিডব্যাক</label>
-                    <textarea 
-                      value={feedbackText}
-                      onChange={(e) => setFeedbackText(e.target.value)}
-                      placeholder="মতামত এখানে লিখুন..."
-                      className="w-full p-4 rounded-2xl bg-white border-2 border-transparent focus:border-gov-green outline-none font-hind text-sm md:text-base min-h-[120px] resize-none shadow-sm"
-                    ></textarea>
-                    <div className="flex justify-end">
-                      <button 
-                        onClick={handleSaveFeedback}
-                        className="px-6 py-3 bg-slate-900 text-white text-[10px] font-black rounded-xl hover:bg-gov-green transition-all uppercase tracking-widest active:scale-95"
-                      >
-                        Update Feedback
-                      </button>
-                    </div>
+              {/* Feedback */}
+              <div className="bg-amber-50/50 p-6 rounded-2xl border border-amber-100/50 space-y-4">
+                <label className="text-[9px] font-black text-amber-700 uppercase tracking-widest block">অফিসিয়াল ফিডব্যাক</label>
+                <textarea 
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="মতামত এখানে লিখুন..."
+                  className="w-full p-4 rounded-xl bg-white border border-amber-100 outline-none font-hind text-sm md:text-base min-h-[100px] resize-none shadow-sm"
+                ></textarea>
+                <div className="flex justify-end">
+                  <button onClick={handleSaveFeedback} className="px-6 py-2 bg-slate-900 text-white text-[10px] font-black rounded-lg hover:bg-gov-green transition-all uppercase tracking-widest">Update Feedback</button>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Sticky Action Bar - REMOVED PICHONE JAN BUTTON AS REQUESTED */}
-            <div className="p-6 md:p-8 border-t bg-white/90 backdrop-blur-3xl shrink-0 flex flex-wrap gap-4 items-center justify-between">
+            {/* Sticky Actions */}
+            <div className="p-6 md:p-8 border-t bg-slate-50/90 shrink-0 flex flex-wrap gap-3 items-center">
               <div className="flex gap-3 flex-1 min-w-[200px]">
                 <button 
                   onClick={() => handleStatusUpdate(selectedItem.id, 'solved')}
-                  className={`flex-1 py-4 rounded-2xl font-black font-hind text-base transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ${
-                    selectedItem.status === 'solved' ? 'bg-emerald-600 text-white shadow-emerald-200' : 'bg-white border-2 border-emerald-100 text-emerald-600 hover:bg-emerald-50'
+                  className={`flex-1 py-3.5 rounded-xl font-black font-hind text-sm transition-all shadow-sm flex items-center justify-center gap-2 ${
+                    selectedItem.status === 'solved' ? 'bg-emerald-600 text-white' : 'bg-white border border-emerald-100 text-emerald-600'
                   }`}
                 >
                   সমাধানকৃত
                 </button>
                 <button 
                   onClick={() => handleStatusUpdate(selectedItem.id, 'rejected')}
-                  className={`flex-1 py-4 rounded-2xl font-black font-hind text-base transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ${
-                    selectedItem.status === 'rejected' ? 'bg-gov-red text-white shadow-red-200' : 'bg-white border-2 border-red-100 text-gov-red hover:bg-red-50'
+                  className={`flex-1 py-3.5 rounded-xl font-black font-hind text-sm transition-all shadow-sm flex items-center justify-center gap-2 ${
+                    selectedItem.status === 'rejected' ? 'bg-gov-red text-white' : 'bg-white border border-red-100 text-gov-red'
                   }`}
                 >
                   বাতিল করুন
                 </button>
               </div>
-              
               <button 
                 onClick={handlePrint}
-                className="w-full md:w-auto px-8 py-4 bg-slate-100 text-slate-900 rounded-2xl hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center gap-2 font-black text-[9px] uppercase tracking-widest"
+                className="w-full md:w-auto px-6 py-3.5 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition-all font-black text-[9px] uppercase tracking-widest flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                 Print Card

@@ -11,7 +11,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentView, onViewChange, isAuthenticated, onLogout }) => {
   return (
-    <header className="glass-nav border-b shadow-sm sticky top-0 z-40 transition-all duration-300">
+    <header className="glass-nav border-b shadow-sm relative z-40 transition-all duration-300">
       <div className="container mx-auto px-4 py-2 md:py-4 flex items-center justify-between gap-3">
         {/* Logo and Name Container */}
         <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0 group">
