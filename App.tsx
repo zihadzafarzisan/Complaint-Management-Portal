@@ -20,16 +20,14 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    db.getSession().then(session => {
-      setIsAuthenticated(!!session);
-    });
-
+    // We don't auto-restore admin session on mount to ensure logout on refresh
+    // But we still listen for auth changes during the active session
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      if (event === 'SIGNED_IN') {
         if (session?.user?.app_metadata?.role === 'admin') {
           setIsAuthenticated(true);
         } else {
-          if (event === 'SIGNED_IN') supabase.auth.signOut();
+          supabase.auth.signOut();
           setIsAuthenticated(false);
         }
       } else if (event === 'SIGNED_OUT') {

@@ -5,9 +5,10 @@ import { ComplaintForm } from '../types';
 const SUPABASE_URL = 'https://sivsatmudoauqubvcfea.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNpdnNhdG11ZG9hdXF1YnZjZmVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEyNTM2NjcsImV4cCI6MjA4NjgyOTY2N30.3M6Ed0u61uydZvOzTKW5IYFnpx2AJ1ZFL4xRNoaHyF8';
 
+// Set persistSession to false so login session clears on refresh
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    persistSession: true,
+    persistSession: false,
     autoRefreshToken: true,
     detectSessionInUrl: true
   }
