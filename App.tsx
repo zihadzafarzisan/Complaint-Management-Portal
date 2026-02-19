@@ -95,20 +95,10 @@ const App: React.FC = () => {
         {currentView === 'public' && (
           <div className="view-transition max-w-4xl mx-auto space-y-8 md:space-y-12">
             <div className="bg-white rounded-2xl md:rounded-[2.5rem] shadow-xl md:shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100">
-              <div className="bg-gov-green p-8 md:p-20 text-center relative overflow-hidden group">
+              <div className="bg-gov-green p-8 md:p-24 text-center relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-                <h1 className="text-3xl sm:text-4xl md:text-7xl font-black mb-4 md:mb-8 tracking-tight text-white font-hind leading-tight px-2">আপনার কথা বলুন সরাসরি</h1>
-                <p className="text-base md:text-2xl opacity-90 leading-relaxed max-w-2xl mx-auto text-white font-hind font-medium mb-8 md:mb-12 px-4">জনপ্রতিনিধির কাছে আপনার এলাকার সমস্যা সরাসরি পৌঁছে দিন।</p>
-                <div className="max-w-md mx-auto relative group px-4 md:px-0">
-                  <form onSubmit={(e) => {
-                    e.preventDefault();
-                    const mobile = (e.currentTarget.elements.namedItem('search_mobile') as HTMLInputElement).value;
-                    handleUserLogin(mobile);
-                  }} className="relative flex flex-col sm:flex-row bg-white p-1.5 md:p-2 rounded-xl md:rounded-2xl shadow-lg gap-2">
-                    <input name="search_mobile" required type="tel" placeholder="অবস্থা দেখতে নম্বর লিখুন..." className="flex-1 px-4 md:px-6 py-3 md:py-4 bg-transparent outline-none text-slate-800 font-bold placeholder:text-slate-400 font-hind text-center sm:text-left" />
-                    <button type="submit" className="bg-gov-red text-white px-6 md:px-8 py-3 md:py-4 rounded-lg md:rounded-xl font-black flex items-center justify-center gap-2 hover:bg-gov-red/90 transition-all active:scale-95">খুঁজুন</button>
-                  </form>
-                </div>
+                <h1 className="text-3xl sm:text-4xl md:text-7xl font-black mb-4 md:mb-8 tracking-tight text-white font-hind leading-tight px-2 animate-in fade-in slide-in-from-top-4 duration-700">আপনার কথা বলুন সরাসরি</h1>
+                <p className="text-base md:text-2xl opacity-90 leading-relaxed max-w-2xl mx-auto text-white font-hind font-medium px-4 animate-in fade-in slide-in-from-top-2 duration-1000">জনপ্রতিনিধির কাছে আপনার এলাকার সমস্যা সরাসরি পৌঁছে দিন।</p>
               </div>
               <div className="p-6 md:p-16">
                 <div className="mb-8 md:mb-12 flex items-center gap-4 md:gap-5">
